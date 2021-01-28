@@ -1,4 +1,5 @@
-import { Component, Host, h, Prop } from '@stencil/core';
+import { Component, Host, h, Prop, Element } from '@stencil/core';
+import { btypes, positions } from './btypes';
 
 @Component({
   tag: 'fl-badge',
@@ -7,43 +8,84 @@ import { Component, Host, h, Prop } from '@stencil/core';
 })
 export class FlBadge {
 
-enum btypes {
-    PRIMARY = {
-        COLOR = "red",
-        TEXT = "Default"
-    },
-    SUCCESS = {
-        COLOR = "green",
-        TEXT = "Success"
-    },
-    DANGER = {
-        COLOR = "red",
-        TEXT = "Danger"
-    }, 
-    INFO = {
-        COLOR = "lightblue",
-        TEXT = "Info"
-    },
-    WARNING = {
-        COLOR = "yello",
-        TEXT = "Warning"
-    },
+@Prop() type: btypes = btypes.PRIMARY;
+
+@Prop() count: number | string;
+
+@Prop() pill: boolean = false;
+
+@Prop() cust_color: string;
+
+@Prop() cust_style: string;
+private _cust_style: { [key: string]: string; } 
+
+@Prop() position: positions = positions.NONE;
+
+@Element() private element: HTMLElement;
+
+private _colors = {
+  "primary" : "#B10DC9",
+  "success" : "green",
+  "danger" : "red",
+  "info" : "blue",
+  "warning" : "yellow"
 }
 
-@Prop() testing: string;
+componentWillLoad() {
+  console.log(this.element.innerText)
+  this.element.parentElement.style.position = 'relative';
+  console.log(this.cust_color);
+  // Just ensures some default type is set for badge
+  if (!Object.values(btypes).includes(this.type)) {
+    this.type = btypes.PRIMARY;
+  }
 
-
-
-  componentDidLoad() {
-    console.log(types);      
+  // Sets custom styles if present otherwise creates style object based around specified props.
+  if (this.cust_style != undefined && this.cust_style != null && this.cust_style != '') {
+    try {
+      this._cust_style = JSON.parse(this.cust_style);
+    } catch (error) {
+      throw Error('Formatting issue with custom style. Please verify the input string is parsable via JSON.')
+    }
+  } else {
+    var pos = this.position.split("-", 2);
+    if (pos.length == 0) {
+      this._cust_style = {
+        backgroundColor: this._colors[this.type], 
+        borderRadius: this.pill ? '16px' : '0px', 
+        position: 'absolute', 
+        paddingTop:'3px',
+        paddingBottom: '4px',
+        paddingLeft: '6px',
+        paddingRight: '6px',
+        textAlign: 'center'
+      };
+    } else {
+      this._cust_style = {
+        backgroundColor: this._colors[this.type], 
+        borderRadius: this.pill ? '16px' : '0px', 
+        position: 'absolute', 
+        paddingTop:'3px',
+        paddingBottom: '4px',
+        paddingLeft: '6px',
+        paddingRight: '6px',
+        textAlign: 'center',
+        [pos[0]]: '-10px',
+        [pos[1]]: '-10px'
+      };
+    }
+    // custom color overrides type background color
+    if (this.cust_color) {
+      this._cust_style.backgroundColor = this.cust_color;
+    }
+  }
   }
 
   render() {
     return (
-      <Host style={{backgroundColor: "red", border: "2px solid red"}}>Hi How are you{this.testing}
+      <Host style={this._cust_style}>{!this.element.innerText ? this.type : null}
         <slot></slot>
       </Host>
     );
   }
-
 }

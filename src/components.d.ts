@@ -5,9 +5,15 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
+import { btypes, positions } from "./components/fl-badge/btypes";
 export namespace Components {
     interface FlBadge {
-        "testing": string;
+        "count": number | string;
+        "cust_color": string;
+        "cust_style": string;
+        "pill": boolean;
+        "position": positions;
+        "type": btypes;
     }
     interface MyComponent {
         /**
@@ -44,7 +50,12 @@ declare global {
 }
 declare namespace LocalJSX {
     interface FlBadge {
-        "testing"?: string;
+        "count"?: number | string;
+        "cust_color"?: string;
+        "cust_style"?: string;
+        "pill"?: boolean;
+        "position"?: positions;
+        "type"?: btypes;
     }
     interface MyComponent {
         /**
